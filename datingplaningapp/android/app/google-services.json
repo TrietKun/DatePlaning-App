@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "499720133771",
+    "project_id": "plandate-1ead3",
+    "storage_bucket": "plandate-1ead3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499720133771:android:157c23db3b92531405088e",
+        "android_client_info": {
+          "package_name": "com.example.datingplaningapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhCzZjZlfPBu-JhtrmeSmQ_aYQhYBUK9k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
