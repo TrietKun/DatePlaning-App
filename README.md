@@ -17,7 +17,6 @@
 
 - **Flutter** – Xây dựng ứng dụng di động đa nền tảng (Android & iOS).  
 - **Firebase** – Authentication, Firestore Database, Cloud Storage.  
-- **Provider / BLoC** – Quản lý trạng thái mượt mà.  
 - **Open Street map** – Gợi ý & hiển thị vị trí hẹn hò.  
 
 ---
@@ -37,6 +36,10 @@
 
 
 ---
+
+## 🎥 Demo
+
+[![Watch the video](https://img.youtube.com/vi/1CRRKx0TMaI/hqdefault.jpg)](https://youtube.com/shorts/1CRRKx0TMaI)
 
 ## ⚙️ Cài đặt & chạy thử
 
