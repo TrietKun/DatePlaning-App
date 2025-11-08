@@ -1,51 +1,53 @@
-name: Flutter CI/CD Firebase Distribution
+name: Flutter CI/CD for Firebase Distribution
 
 on:
   push:
     branches:
-      - main  # hoặc branch bạn muốn trigger
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
-      - name: Checkout source code
+      - name: Checkout source
         uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.1' 
-          
-      - name: CD root
-        run: cd datingplaningapp
+          flutter-version: '3.24.1'
 
       - name: Install dependencies
         run: flutter pub get
+        working-directory: datingplaningapp
 
-      - name: Analyze code
+      - name: Analyze
         run: flutter analyze
+        working-directory: datingplaningapp
 
       - name: Run tests
         run: flutter test
+        working-directory: datingplaningapp
 
-      - name: Build release APK
+      # ===== Build Android =====
+      - name: Build Android APK
         run: flutter build apk --release
+        working-directory: datingplaningapp
 
-      - name: Distribute to Firebase App Distribution
+      - name: Distribute Android APK to Firebase
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
-          appId: ${{ secrets.FIREBASE_APP_ID }}
+          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
           token: ${{ secrets.FIREBASE_AUTH_TOKEN }}
           groups: internal-testers
-          releaseNotes: "Auto build from GitHub Actions"
-          file: build/app/outputs/flutter-apk/app-release.apk
+          releaseNotes: "Android build from GitHub Actions"
+          file: datingplaningapp/build/app/outputs/flutter-apk/app-release.apk
 
-       # ===== Build iOS =====
+      # ===== Build iOS =====
       # - name: Build iOS IPA
-      #   run: |
-      #     flutter build ipa --release --no-codesign
+      #   run: flutter build ipa --release --no-codesign
+      #   working-directory: datingplaningapp
 
       # - name: Distribute iOS IPA to Firebase
       #   uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -54,4 +56,4 @@ jobs:
       #     token: ${{ secrets.FIREBASE_AUTH_TOKEN }}
       #     groups: internal-testers
       #     releaseNotes: "iOS build from GitHub Actions"
-      #     file: build/ios/ipa/*.ipa
+      #     file: datingplaningapp/build/ios/ipa/*.ipa
