@@ -1,0 +1,40 @@
+name: Flutter CI/CD Firebase Distribution
+
+on:
+  push:
+    branches:
+      - main  # hoặc branch bạn muốn trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.1' 
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Distribute to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{ secrets.FIREBASE_AUTH_TOKEN }}
+          groups: internal-testers
+          releaseNotes: "Auto build from GitHub Actions"
+          file: build/app/outputs/flutter-apk/app-release.apk
