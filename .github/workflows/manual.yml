@@ -17,6 +17,9 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.1' 
+          
+      - name: CD root
+        run: cd datingplaningapp
 
       - name: Install dependencies
         run: flutter pub get
