@@ -38,3 +38,17 @@ jobs:
           groups: internal-testers
           releaseNotes: "Auto build from GitHub Actions"
           file: build/app/outputs/flutter-apk/app-release.apk
+
+       # ===== Build iOS =====
+      # - name: Build iOS IPA
+      #   run: |
+      #     flutter build ipa --release --no-codesign
+
+      # - name: Distribute iOS IPA to Firebase
+      #   uses: wzieba/Firebase-Distribution-Github-Action@v1
+      #   with:
+      #     appId: ${{ secrets.FIREBASE_IOS_APP_ID }}
+      #     token: ${{ secrets.FIREBASE_AUTH_TOKEN }}
+      #     groups: internal-testers
+      #     releaseNotes: "iOS build from GitHub Actions"
+      #     file: build/ios/ipa/*.ipa
