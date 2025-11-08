@@ -30,7 +30,7 @@ jobs:
       - name: Distribute Android APK to Firebase
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
-          app: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          app: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           groups: internal-testers
           releaseNotes: "🚀 Android build from GitHub Actions"
