@@ -13,12 +13,14 @@ class PaymentScreen extends StatefulWidget {
   State<PaymentScreen> createState() => _PaymentScreenState();
 }
 
-class _PaymentScreenState extends State<PaymentScreen> {
+class _PaymentScreenState extends State<PaymentScreen>
+    with WidgetsBindingObserver {
   final PaymentService _paymentService = PaymentService();
   final VnPayLinkListener _linkListener = VnPayLinkListener();
 
   String? selectedPackage;
   bool isProcessing = false;
+  bool _isLoadingUserData = false;
 
   final List<PackageInfo> packages = [
     PackageInfo(
@@ -81,15 +83,68 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
     // 🔹 BẮT ĐẦU LẮNG NGHE DEEP LINK
     _linkListener.startListening(context);
+
+    // 🔹 Load dữ liệu user lần đầu
+    _loadUserData();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
     // 🔹 HỦY LISTENER KHI WIDGET BỊ DISPOSE
     _linkListener.dispose();
     super.dispose();
+  }
+
+  // 🔹 Lắng nghe khi app quay lại từ background (sau khi thanh toán)
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      print('📱 App resumed, refreshing user data...');
+      _loadUserData();
+    }
+  }
+
+  // 🔹 Load lại thông tin user từ database
+  Future<void> _loadUserData() async {
+    if (_isLoadingUserData) return;
+
+    setState(() => _isLoadingUserData = true);
+
+    try {
+      // TODO: Thay thế bằng service thực tế của bạn
+      // Ví dụ:
+      // final updatedUser = await _paymentService.getCurrentUser();
+      // if (mounted) {
+      //   setState(() {
+      //     currentUser = updatedUser;
+      //   });
+      // }
+
+      // Giả lập delay
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      print('✅ User data refreshed');
+
+      if (mounted) {
+        setState(() {
+          // Force rebuild để cập nhật UI
+        });
+      }
+    } catch (e) {
+      print('❌ Error loading user data: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingUserData = false);
+      }
+    }
   }
 
   @override
@@ -98,39 +153,61 @@ class _PaymentScreenState extends State<PaymentScreen> {
       appBar: AppBar(
         title: const Text('Nạp Tiền & Nâng Cấp VIP'),
         elevation: 0,
+        actions: [
+          // 🔹 Nút refresh thủ công
+          IconButton(
+            icon: _isLoadingUserData
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Icon(Icons.refresh),
+            onPressed: _isLoadingUserData ? null : _loadUserData,
+            tooltip: 'Làm mới',
+          ),
+        ],
       ),
       body: Column(
         children: [
           _buildUserInfoCard(),
           const SizedBox(height: 16),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                const Text(
-                  'Gói Nạp Xu',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+            child: RefreshIndicator(
+              onRefresh: _loadUserData,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  const Text(
+                    'Gói Nạp Xu',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                ...packages
-                    .where((p) => !p.isVip)
-                    .map((p) => _buildPackageCard(p)),
-                const SizedBox(height: 24),
-                const Text(
-                  'Gói VIP',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 12),
+                  ...packages
+                      .where((p) => !p.isVip)
+                      .map((p) => _buildPackageCard(p)),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Gói VIP',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                ...packages
-                    .where((p) => p.isVip)
-                    .map((p) => _buildPackageCard(p)),
-              ],
+                  const SizedBox(height: 12),
+                  ...packages
+                      .where((p) => p.isVip)
+                      .map((p) => _buildPackageCard(p)),
+                  const SizedBox(
+                      height: 100), // Padding để tránh bị che bởi button
+                ],
+              ),
             ),
           ),
           if (selectedPackage != null) _buildPaymentButton(),
@@ -233,7 +310,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
       ),
       child: InkWell(
-        onTap: () => setState(() => selectedPackage = package.id),
+        onTap: isProcessing
+            ? null
+            : () => setState(() => selectedPackage = package.id),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -307,115 +386,116 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Widget _buildPaymentButton() {
     return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            decoration: BoxDecoration(
-              gradient: isProcessing
-                  ? LinearGradient(
-                      colors: [Colors.grey.shade400, Colors.grey.shade300],
-                    )
-                  : LinearGradient(
-                      colors: [
-                        Colors.blue.shade600,
-                        Colors.purple.shade500,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          decoration: BoxDecoration(
+            gradient: isProcessing
+                ? LinearGradient(
+                    colors: [Colors.grey.shade400, Colors.grey.shade300],
+                  )
+                : LinearGradient(
+                    colors: [
+                      Colors.blue.shade600,
+                      Colors.purple.shade500,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: isProcessing
+                    ? Colors.grey.withOpacity(0.3)
+                    : Colors.blue.withOpacity(0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: isProcessing ? null : _processPayment,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: isProcessing
-                      ? Colors.grey.withOpacity(0.3)
-                      : Colors.blue.withOpacity(0.4),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: isProcessing ? null : _processPayment,
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  child: isProcessing
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              height: 22,
-                              width: 22,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white.withOpacity(0.9),
-                                ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                child: isProcessing
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white.withOpacity(0.9),
                               ),
                             ),
-                            const SizedBox(width: 16),
-                            Text(
-                              'Đang xử lý thanh toán...',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withOpacity(0.9),
-                                letterSpacing: 0.5,
-                              ),
+                          ),
+                          const SizedBox(width: 16),
+                          Text(
+                            'Đang xử lý thanh toán...',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white.withOpacity(0.9),
+                              letterSpacing: 0.5,
                             ),
-                          ],
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.payment_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Thanh Toán Ngay',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(
-                              Icons.arrow_forward_rounded,
+                            child: const Icon(
+                              Icons.payment_rounded,
                               color: Colors.white,
                               size: 20,
                             ),
-                          ],
-                        ),
-                ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Text(
+                            'Thanh Toán Ngay',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ],
+                      ),
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Future<void> _processPayment() async {
@@ -455,9 +535,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
           // Hiển thị thông báo cho user
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Đang chuyển đến trang thanh toán...'),
-                duration: Duration(seconds: 2),
+              SnackBar(
+                content: const Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.white),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                          'Đang chuyển đến trang thanh toán...\nSau khi thanh toán, vui lòng quay lại app.'),
+                    ),
+                  ],
+                ),
+                duration: const Duration(seconds: 4),
+                backgroundColor: Colors.blue.shade700,
               ),
             );
           }
@@ -470,14 +560,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi: $e'),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text('Lỗi: $e')),
+              ],
+            ),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
           ),
         );
       }
     } finally {
       if (mounted) {
-        setState(() => isProcessing = false);
+        setState(() {
+          isProcessing = false;
+          selectedPackage = null; // Reset selection sau khi xử lý
+        });
       }
     }
   }
