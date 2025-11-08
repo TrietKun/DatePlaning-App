@@ -42,12 +42,31 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   // Background options với gradients đẹp
   final Map<String, List<Color>> _backgroundOptions = {
-    'gradient1': [Color(0xFFFF9A9E), Color(0xFFFECFEF), Color(0xFFFECFEF)],
-    'gradient2': [Color(0xFFA18CD1), Color(0xFFFBC2EB)],
-    'gradient3': [Color(0xFFFFD3E1), Color(0xFFFFA8DC), Color(0xFFE0BBE4)],
-    'gradient4': [Color(0xFFB2FEFA), Color(0xFF0ED2F7)],
-    'gradient5': [Color(0xFFFBD3E9), Color(0xFFBB377D)],
-    'gradient6': [Color(0xFFFFECD2), Color(0xFFFCB69F)],
+    'gradient1': [
+      const Color(0xFFFF1493),
+      const Color(0xFF000000),
+    ],
+    'gradient2': [
+      const Color(0xFFA18CD1),
+      const Color(0xFFFBC2EB),
+    ],
+    'gradient3': [
+      const Color(0xFFFFD3E1),
+      const Color(0xFFFFA8DC),
+      const Color(0xFFE0BBE4)
+    ],
+    'gradient4': [
+      const Color(0xFFB2FEFA),
+      const Color(0xFF0ED2F7),
+    ],
+    'gradient5': [
+      const Color(0xFFFBD3E9),
+      const Color(0xFFBB377D),
+    ],
+    'gradient6': [
+      const Color(0xFFFFECD2),
+      const Color(0xFFFCB69F),
+    ],
   };
 
   // Emoji list mở rộng
@@ -282,10 +301,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       if (image != null) {
         _showLoadingDialog();
         final imageUrl = await _uploadImage(File(image.path));
+        // ignore: use_build_context_synchronously
         Navigator.pop(context);
         await _sendMessage(imageUrl: imageUrl);
       }
     } catch (e) {
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
       _showErrorDialog('Lỗi khi gửi ảnh: $e');
     }
@@ -301,10 +322,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       if (photo != null) {
         _showLoadingDialog();
         final imageUrl = await _uploadImage(File(photo.path));
+        // ignore: use_build_context_synchronously
         Navigator.pop(context);
         await _sendMessage(imageUrl: imageUrl);
       }
     } catch (e) {
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
       _showErrorDialog('Lỗi khi chụp ảnh: $e');
     }
@@ -327,7 +350,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       barrierDismissible: false,
       builder: (context) => Center(
         child: Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(15),
@@ -352,10 +375,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
             style: TextButton.styleFrom(
               foregroundColor: _backgroundOptions[_selectedBackground]![0],
             ),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -367,7 +390,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
@@ -386,7 +409,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Chọn nền chat',
               style: TextStyle(
@@ -395,10 +418,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 color: Colors.grey[800],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             GridView.builder(
               shrinkWrap: true,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
@@ -413,7 +436,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     Navigator.pop(context);
                   },
                   child: AnimatedContainer(
-                    duration: Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
                       gradient: LinearGradient(
@@ -428,12 +451,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         BoxShadow(
                           color: entry.value[0].withOpacity(0.3),
                           blurRadius: 10,
-                          offset: Offset(0, 4),
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
                     child: _selectedBackground == entry.key
-                        ? Icon(
+                        ? const Icon(
                             Icons.check_circle,
                             color: Colors.white,
                             size: 30,
@@ -443,7 +466,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 );
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -456,7 +479,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Widget _buildEmojiPicker() {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       height: _showEmojiPicker ? 280 : 0,
       child: Container(
         decoration: BoxDecoration(
@@ -465,7 +488,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               blurRadius: 5,
-              offset: Offset(0, -2),
+              offset: const Offset(0, -2),
             ),
           ],
         ),
@@ -495,7 +518,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             Expanded(
               child: GridView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 8,
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
@@ -518,7 +541,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       child: Center(
                         child: Text(
                           _emojis[index],
-                          style: TextStyle(fontSize: 24),
+                          style: const TextStyle(fontSize: 24),
                         ),
                       ),
                     ),
@@ -526,7 +549,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 },
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -548,13 +571,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             CircleAvatar(
               radius: 16,
               backgroundColor: Colors.pink[300],
-              child: Text(
+              child: const Text(
                 'P',
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
           ],
           Container(
             constraints: BoxConstraints(
@@ -566,16 +589,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   ? _backgroundOptions[_selectedBackground]![0]
                   : Colors.grey[100],
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(18),
-                topRight: Radius.circular(18),
-                bottomLeft: isMe ? Radius.circular(18) : Radius.circular(4),
-                bottomRight: isMe ? Radius.circular(4) : Radius.circular(18),
+                topLeft: const Radius.circular(18),
+                topRight: const Radius.circular(18),
+                bottomLeft:
+                    isMe ? const Radius.circular(18) : const Radius.circular(4),
+                bottomRight:
+                    isMe ? const Radius.circular(4) : const Radius.circular(18),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
                   blurRadius: 8,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -585,7 +610,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               children: [
                 if (msg["type"] == "image" && msg["imageUrl"] != null)
                   Container(
-                    constraints: BoxConstraints(maxWidth: 250, maxHeight: 300),
+                    constraints:
+                        const BoxConstraints(maxWidth: 250, maxHeight: 300),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
@@ -593,7 +619,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
-                          return Container(
+                          return SizedBox(
                             height: 200,
                             child: Center(
                               child: CircularProgressIndicator(
@@ -605,7 +631,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           );
                         },
                         errorBuilder: (context, error, stackTrace) {
-                          return Container(
+                          return const SizedBox(
                             height: 200,
                             child: Center(
                               child: Icon(
@@ -628,7 +654,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Text(
                   time,
                   style: TextStyle(
@@ -641,11 +667,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ),
           ),
           if (isMe) ...[
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             CircleAvatar(
               radius: 16,
               backgroundColor: Colors.blue[300],
-              child: Text(
+              child: const Text(
                 'M',
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -666,15 +692,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 CircleAvatar(
                   radius: 16,
                   backgroundColor: _backgroundOptions[_selectedBackground]![1],
-                  child: Text(
+                  child: const Text(
                     'P',
                     style: TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(18),
@@ -682,7 +709,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       BoxShadow(
                         color: Colors.black.withOpacity(0.05),
                         blurRadius: 8,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -706,7 +733,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           );
                         },
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       AnimatedBuilder(
                         animation: _typingDotAnimation,
                         builder: (context, child) {
@@ -725,7 +752,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           );
                         },
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       AnimatedBuilder(
                         animation: _typingDotAnimation,
                         builder: (context, child) {
@@ -743,7 +770,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           );
                         },
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         "đang nhập...",
                         style: TextStyle(
@@ -758,7 +785,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ],
             ),
           )
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 
   @override
@@ -787,7 +814,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     color: _backgroundOptions[_selectedBackground]![0]
                         .withOpacity(0.3),
                     blurRadius: 20,
-                    offset: Offset(0, 10),
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
@@ -801,9 +828,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 ),
               ),
             ),
-            SizedBox(height: 30),
-            FindButton(),
-            SizedBox(height: 20),
+            const SizedBox(height: 30),
+            const FindButton(),
+            const SizedBox(height: 20),
             Text(
               'Tìm một người bạn để bắt đầu trò chuyện!',
               style: TextStyle(
@@ -854,7 +881,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     color: _backgroundOptions[_selectedBackground]![0]
                         .withOpacity(0.3),
                     blurRadius: 10,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -868,12 +895,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       color: _backgroundOptions[_selectedBackground]![0],
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Chat',
                           style: TextStyle(
                             color: Colors.white,
@@ -893,7 +920,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   ),
                   IconButton(
                     onPressed: _showBackgroundPicker,
-                    icon: Icon(Icons.palette, color: Colors.white),
+                    icon: const Icon(Icons.palette, color: Colors.white),
                   ),
                 ],
               ),
@@ -932,7 +959,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             size: 64,
                             color: Colors.grey[400],
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           Text(
                             "Chưa có tin nhắn nào. Hãy chào nhau! 👋",
                             style: TextStyle(
@@ -963,7 +990,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     children: [
                       if (_isLoadingMore)
                         Padding(
-                          padding: EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(12.0),
                           child: CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(
                               _backgroundOptions[_selectedBackground]![0],
@@ -973,7 +1000,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       Expanded(
                         child: ListView.builder(
                           controller: _scrollController,
-                          padding: EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
                           itemCount:
                               messages.length + 1, // +1 cho typing indicator
                           itemBuilder: (context, index) {
@@ -1008,7 +1035,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
             // Input area
             Container(
-              margin: EdgeInsets.all(12),
+              margin: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(25),
@@ -1016,7 +1043,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
                     blurRadius: 10,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -1025,15 +1052,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   // Attachment button
                   PopupMenuButton<String>(
                     icon: Container(
-                      margin: EdgeInsets.all(8),
-                      padding: EdgeInsets.all(8),
+                      margin: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: _backgroundOptions[_selectedBackground]!,
                         ),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.add, color: Colors.white, size: 20),
+                      child:
+                          const Icon(Icons.add, color: Colors.white, size: 20),
                     ),
                     onSelected: (value) {
                       switch (value) {
@@ -1056,8 +1084,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             Icon(Icons.photo_library,
                                 color: _backgroundOptions[_selectedBackground]![
                                     0]),
-                            SizedBox(width: 12),
-                            Text('Thư viện'),
+                            const SizedBox(width: 12),
+                            const Text('Thư viện'),
                           ],
                         ),
                       ),
@@ -1068,8 +1096,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             Icon(Icons.camera_alt,
                                 color: _backgroundOptions[_selectedBackground]![
                                     0]),
-                            SizedBox(width: 12),
-                            Text('Camera'),
+                            const SizedBox(width: 12),
+                            const Text('Camera'),
                           ],
                         ),
                       ),
@@ -1085,7 +1113,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         hintText: 'Nhập tin nhắn...',
                         hintStyle: TextStyle(color: Colors.grey[500]),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,
                         ),
@@ -1105,7 +1133,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           ],
                         ),
                       ),
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                       onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
@@ -1117,7 +1145,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       return Transform.scale(
                         scale: _sendButtonAnimation.value,
                         child: Container(
-                          margin: EdgeInsets.all(8),
+                          margin: const EdgeInsets.all(8),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
@@ -1132,7 +1160,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 }
                               },
                               child: Container(
-                                padding: EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: _backgroundOptions[
@@ -1145,11 +1173,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                               _selectedBackground]![0]
                                           .withOpacity(0.3),
                                       blurRadius: 8,
-                                      offset: Offset(0, 2),
+                                      offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.send_rounded,
                                   color: Colors.white,
                                   size: 20,
